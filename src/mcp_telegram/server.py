@@ -1,5 +1,6 @@
 """MCP Telegram Server."""
 
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -13,18 +14,20 @@ from mcp_telegram.utils import parse_entity
 
 @asynccontextmanager
 async def app_lifespan(server: FastMCP) -> AsyncIterator[None]:
-    """Lifespan manager for the app.
+        """Lifespan manager for the app.
 
-    This will connect to Telegram on startup and disconnect on shutdown.
-    """
-    try:
-        tg.create_client()
-        await tg.client.connect()
-        yield
-    finally:
+            This will connect to Telegram on startup and disconnect on shutdown.
+                """
+        try:
+                    tg.create_client()
+                    bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
+                    if bot_token:
+                                    await tg.client.start(bot_token=bot_token)
+        else:
+                        await tg.client.connect()
+                    yield
+finally:
         await tg.client.disconnect()  # type: ignore
-
-
 tg = Telegram()
 mcp = FastMCP(
     "mcp-telegram",
