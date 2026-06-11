@@ -2,12 +2,12 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-RUN pip install uv
+RUN apt-get update && apt-get install -y gcc libssl-dev && rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml ./
 COPY src/ ./src/
 
-RUN uv pip install --system --no-cache .
+RUN pip install --no-cache-dir hatchling && pip install --no-cache-dir -e .
 
 EXPOSE 8080
 
